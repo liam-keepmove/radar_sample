@@ -1,19 +1,25 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
+#include <DataModel.hpp>
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    const QUrl url(u"qrc:/radar/Main.qml"_qs);
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-        &app, [url](QObject *obj, const QUrl &objUrl) {
+    const QUrl url("qrc:/radar/Main.qml");
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreated,
+        &app,
+        [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
-        }, Qt::QueuedConnection);
+        },
+        Qt::QueuedConnection);
+    QScopedPointer<DataModel> dataModel(new DataModel());
+    engine.rootContext()->setContextProperty("dataModel", dataModel.data());
     engine.load(url);
-
     return app.exec();
 }

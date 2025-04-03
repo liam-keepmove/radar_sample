@@ -5,7 +5,7 @@ Window {
     id: mainWindow;
     visible: true;
     visibility: "Maximized";
-//    visibility: "FullScreen";
+//  visibility: "FullScreen";
     title: qsTr("radar");
     Rectangle {
         id: root;
@@ -14,15 +14,12 @@ Window {
         Radar {
             anchors.fill: parent;
             anchors.centerIn: parent;
+            model: dataModel;
+            delegate: Rectangle {
+                width: 15;
+                height: width;
+                color: "green";
+            }
         }
-//        Row{
-
-//            Rectangle {
-//                radius: 10;
-
-//            }
-
-//        }
     }
-
 }

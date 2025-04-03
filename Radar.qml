@@ -7,9 +7,12 @@ Item {
     height: 480;
     property color scaleColor: "#acacac";
     property int fontSize: 16;
-    property double radius: Math.min(width, height) / 2 - (fontSize * 2);
-    property double centerX: width / 2;
-    property double centerY: height / 2;
+    property var model;
+    property var delegate;
+    readonly property double radius: Math.min(width, height) / 2 - (fontSize * 2);
+    readonly property double centerX: width / 2;
+    readonly property double centerY: height / 2;
+
 
     Canvas {
         id: canvas;
@@ -139,5 +142,17 @@ Item {
         }
     }
 
+    onModelChanged: {
+        renderTarget(model);
+    }
+
+    Component.onCompleted: {
+        renderTarget(model);
+    }
+
+    // 根据数据模型更新或生成目标位置
+    function renderTarget(model) {
+
+    }
 }
 

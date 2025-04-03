@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(radar VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.2
@@ -11,7 +14,8 @@ find_package(Qt6 6.2
 
 qt_add_executable(appradar
     main.cpp
-    DataModel.hpp DataModel.cpp
+    DataModel.hpp
+    DataModel.cpp
 )
 
 qt_add_qml_module(appradar
