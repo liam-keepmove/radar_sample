@@ -54,9 +54,9 @@ DataModel::DataModel(QObject* parent) :
     for (int i = 0; i < 7; ++i) {
         vehicleInfos.push_back(generateRandomTarget());
     }
-    QTimer* timer = new QTimer(this);
+    auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &DataModel::updataData);
-    timer->start(1000);
+    timer->start(this->updateInterval);
 }
 
 DataModel::DataModel(const DataModel& rhs) :
@@ -78,8 +78,15 @@ int DataModel::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant DataModel::data(const QModelIndex& index, int role) const {
-    if (!index.isValid() || index.row() >= vehicleInfos.size())
+    // if (!index.isValid() || index.row() >= vehicleInfos.size())
+    qDebug() << "here1";
+
+    if (index.row() >= vehicleInfos.size())
         return QVariant();
+
+    qDebug() << "here2";
+    qDebug() << "index:" << index << " role:" << role;
+    qDebug() << "index.row():" << index.row() << " index.column():" << index.column();
 
     auto&& entity = vehicleInfos.at(index.row());
     switch (role) {
@@ -88,6 +95,7 @@ QVariant DataModel::data(const QModelIndex& index, int role) const {
     case AngleRole:
         return entity.angle;
     case DistanceRole:
+        qDebug() << "here3";
         return entity.distance;
     case StandpointRole:
         return entity.standpoint;
@@ -105,7 +113,7 @@ QHash<int, QByteArray> DataModel::roleNames() const {
 }
 
 void DataModel::updataData() {
-    QList<VehicleInfo> waitList;
+    decltype(vehicleInfos) waitList;
     for (auto it = vehicleInfos.begin(); it != vehicleInfos.end();) {
         // 利用航向和当前速度算极坐标新的距离和角度，如果距离大于等于探测半径，则判断为超出雷达探测范围，删除此目标，然后增加一个随机新目标
         // 如果距离小于探测半径，则更新目标
@@ -113,12 +121,13 @@ void DataModel::updataData() {
         updateTargetPosition(vehicle, updateInterval);
 
         // 检查是否超出雷达范围
-        if (vehicle.distance >= radiusOfInvestigation) {
-            it = vehicleInfos.erase(it);
+        if (vehicle.distance >= radiusOfDetect) {
+            it = vehicleInfos.erase(decltype(vehicleInfos)::const_iterator(it));
             waitList.push_back(generateRandomTarget());
         } else {
             ++it;
         }
     }
     vehicleInfos.append(waitList);
+    emit dataChanged(QModelIndex(), QModelIndex());
 }

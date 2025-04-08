@@ -8,7 +8,7 @@ Item {
     property color scaleColor: "#acacac";
     property int fontSize: 16;
     property var model;
-    property var delegate;
+    property Component delegate;
     readonly property double radius: Math.min(width, height) / 2 - (fontSize * 2);
     readonly property double centerX: width / 2;
     readonly property double centerY: height / 2;
@@ -152,7 +152,17 @@ Item {
 
     // 根据数据模型更新或生成目标位置
     function renderTarget(model) {
-
+        for (var i = 0; i < model.rowCount(); i++) {
+//            console.log(model.data(model.index(i, 0), 0x100 + 1));
+//            console.log(model.data(model.index(i, 0), 0x100 + 3));
+//            console.log(model.data(model.index(i, 0)).id);
+            var data = {
+                id: model.data(model.index(i, 0)),
+                distance: model.data(model.index(i, 0))
+            };
+            console.log(data.id);
+        }
+        console.log("==================");
     }
 }
 

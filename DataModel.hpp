@@ -39,7 +39,7 @@ private:
     QList<VehicleInfo> vehicleInfos;
     QHash<int, QByteArray> roleNamesMap;
     int updateInterval = 1000;
-    int radiusOfInvestigation = 24000;
+    int radiusOfDetect = 24000;
     enum RoleNames {
         IdRole = Qt::UserRole + 1,
         AngleRole = Qt::UserRole + 2,

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Window
+import org.data_model 1.0
 
 Window {
     id: mainWindow;
@@ -14,7 +15,7 @@ Window {
         Radar {
             anchors.fill: parent;
             anchors.centerIn: parent;
-            model: dataModel;
+            model: DataModel {}
             delegate: Rectangle {
                 width: 15;
                 height: width;

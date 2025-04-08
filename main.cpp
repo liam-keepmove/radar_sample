@@ -13,13 +13,14 @@ int main(int argc, char *argv[])
         &engine,
         &QQmlApplicationEngine::objectCreated,
         &app,
-        [url](QObject *obj, const QUrl &objUrl) {
+        [url](QObject* obj, const QUrl& objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
         },
         Qt::QueuedConnection);
-    QScopedPointer<DataModel> dataModel(new DataModel());
-    engine.rootContext()->setContextProperty("dataModel", dataModel.data());
+    //  QScopedPointer<DataModel> dataModel(new DataModel());
+    //	engine.rootContext()->setContextProperty("dataModel", dataModel.data());
+    qmlRegisterType<DataModel>("org.data_model", 1, 0, "DataModel");
     engine.load(url);
     return app.exec();
 }
