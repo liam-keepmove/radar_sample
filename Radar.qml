@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Shapes 1.15
+import org.data_model 1.0
 
 Item {
     id: radarUI;
@@ -12,7 +13,6 @@ Item {
     readonly property double radius: Math.min(width, height) / 2 - (fontSize * 2);
     readonly property double centerX: width / 2;
     readonly property double centerY: height / 2;
-
 
     Canvas {
         id: canvas;
@@ -142,26 +142,30 @@ Item {
         }
     }
 
-    onModelChanged: {
-        renderTarget(model);
-    }
-
-    Component.onCompleted: {
-        renderTarget(model);
+    Connections {
+        target: model;
+        function onDataChanged() {
+            renderTarget(model);
+        }
     }
 
     // 根据数据模型更新或生成目标位置
     function renderTarget(model) {
-        for (var i = 0; i < model.rowCount(); i++) {
-//            console.log(model.data(model.index(i, 0), 0x100 + 1));
-//            console.log(model.data(model.index(i, 0), 0x100 + 3));
-//            console.log(model.data(model.index(i, 0)).id);
-            var data = {
-                id: model.data(model.index(i, 0)),
-                distance: model.data(model.index(i, 0))
-            };
-            console.log(data.id);
+        let roleNamesMap = model.getRoleNamesMap();
+        let modelList = [];
+        for (let i = 0; i < model.rowCount(); i++) {
+            let index = model.index(i, 0);
+            let tempModel = {};
+            const entries = Object.entries(roleNamesMap);
+            entries.forEach(([roleNum, name]) => {
+                // console.log(roleNum, name);
+                tempModel[roleNum] = model.data(index, name);
+
+            });
+            modelList[i] = tempModel;
+            // console.log("id: ", model.data(model.index(i, 0), roleNamesMap.id), " distance: ", model.data(model.index(i, 0), value_role.distance));
         }
+        console.log(JSON.stringify(modelList));
         console.log("==================");
     }
 }

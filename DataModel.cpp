@@ -3,7 +3,7 @@
 #include <QTimer>
 
 // 更新单个目标位置
-void updateTargetPosition(DataModel::VehicleInfo& vehicle, int timeElapsed) {
+void updateTargetPosition(DataModel::VehicleInfo& vehicle, int timeElapsed /*ms*/) {
     // 计算移动距离 (速度 * 时间)
     double moveDistance = vehicle.speed * (timeElapsed / 1000);
 
@@ -30,17 +30,17 @@ void updateTargetPosition(DataModel::VehicleInfo& vehicle, int timeElapsed) {
 }
 
 // 生成随机目标
-static DataModel::VehicleInfo generateRandomTarget() {
+DataModel::VehicleInfo DataModel::generateRandomTarget() {
     static int id = 4000;
     static auto randDouble = [](double maxValue) {
         return QRandomGenerator::global()->bounded(maxValue);
     };
-    return DataModel::VehicleInfo{.id = id++, .angle = randDouble(360.0), .distance = randDouble(24000), .standpoint = (int)randDouble(5), .area = (int)randDouble(4), .azi = randDouble(360.0), .speed = 5 + randDouble(20)};
+    return DataModel::VehicleInfo{id++, randDouble(360.0), randDouble(radiusOfDetect), (int)randDouble(5), (int)randDouble(4), randDouble(360.0), 5 + randDouble(20)};
 }
 
 DataModel::DataModel(QObject* parent) :
     QAbstractListModel(parent) {
-    this->roleNamesMap = {
+    this->roleNamesHashMap = {
         {IdRole, "id"},
         {AngleRole, "angle"},
         {DistanceRole, "distance"},
@@ -48,6 +48,11 @@ DataModel::DataModel(QObject* parent) :
         {AreaRole, "area"},
         {AziRole, "azi"},
     };
+
+    for (auto [roleNum, name] : roleNamesHashMap.asKeyValueRange()) {
+        this->roleNamesMap[name] = roleNum;
+    }
+
     auto randDouble = [](double maxValue) {
         return QRandomGenerator::global()->bounded(maxValue);
     };
@@ -60,13 +65,13 @@ DataModel::DataModel(QObject* parent) :
 }
 
 DataModel::DataModel(const DataModel& rhs) :
-    vehicleInfos{rhs.vehicleInfos}, roleNamesMap(rhs.roleNames()) {
+    vehicleInfos{rhs.vehicleInfos}, roleNamesHashMap(rhs.roleNames()) {
 }
 
 DataModel& DataModel::operator=(const DataModel& rhs) {
     if (this != &rhs) {
         vehicleInfos = rhs.vehicleInfos;
-        roleNamesMap = rhs.roleNames();
+        roleNamesHashMap = rhs.roleNames();
     }
     return *this;
 }
@@ -78,15 +83,8 @@ int DataModel::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant DataModel::data(const QModelIndex& index, int role) const {
-    // if (!index.isValid() || index.row() >= vehicleInfos.size())
-    qDebug() << "here1";
-
-    if (index.row() >= vehicleInfos.size())
+    if (!index.isValid() || index.row() >= vehicleInfos.size())
         return QVariant();
-
-    qDebug() << "here2";
-    qDebug() << "index:" << index << " role:" << role;
-    qDebug() << "index.row():" << index.row() << " index.column():" << index.column();
 
     auto&& entity = vehicleInfos.at(index.row());
     switch (role) {
@@ -95,7 +93,6 @@ QVariant DataModel::data(const QModelIndex& index, int role) const {
     case AngleRole:
         return entity.angle;
     case DistanceRole:
-        qDebug() << "here3";
         return entity.distance;
     case StandpointRole:
         return entity.standpoint;
@@ -109,6 +106,10 @@ QVariant DataModel::data(const QModelIndex& index, int role) const {
 }
 
 QHash<int, QByteArray> DataModel::roleNames() const {
+    return this->roleNamesHashMap;
+}
+
+QVariantMap DataModel::getRoleNamesMap() const {
     return this->roleNamesMap;
 }
 

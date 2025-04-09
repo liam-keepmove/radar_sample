@@ -21,6 +21,16 @@ public:
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index,
                                       int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
+    Q_INVOKABLE QVariantMap getRoleNamesMap() const;
+
+    enum RoleNames {
+        IdRole = Qt::UserRole + 1,
+        AngleRole = Qt::UserRole + 2,
+        DistanceRole = Qt::UserRole + 3,
+        StandpointRole = Qt::UserRole + 4,
+        AreaRole = Qt::UserRole + 5,
+        AziRole = Qt::UserRole + 6,
+    };
 
     struct VehicleInfo {
         int id;          // 目标载具批号
@@ -31,23 +41,17 @@ public:
         double azi;      // 目标载具航向，单位度
         double speed;    // 速度，用来计算位置变化，单位m/s
     };
+    DataModel::VehicleInfo generateRandomTarget();
 
 private slots:
     void updataData();
 
 private:
     QList<VehicleInfo> vehicleInfos;
-    QHash<int, QByteArray> roleNamesMap;
+    QHash<int, QByteArray> roleNamesHashMap;
+    QVariantMap roleNamesMap;
     int updateInterval = 1000;
     int radiusOfDetect = 24000;
-    enum RoleNames {
-        IdRole = Qt::UserRole + 1,
-        AngleRole = Qt::UserRole + 2,
-        DistanceRole = Qt::UserRole + 3,
-        StandpointRole = Qt::UserRole + 4,
-        AreaRole = Qt::UserRole + 5,
-        AziRole = Qt::UserRole + 6,
-    };
 };
 
 #endif // DATAMODEL_H
