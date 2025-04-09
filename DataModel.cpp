@@ -40,7 +40,7 @@ DataModel::VehicleInfo DataModel::generateRandomTarget() {
 
 DataModel::DataModel(QObject* parent) :
     QAbstractListModel(parent) {
-    this->roleNamesHashMap = {
+    this->roleNumNameHashMap = {
         {IdRole, "id"},
         {AngleRole, "angle"},
         {DistanceRole, "distance"},
@@ -49,8 +49,8 @@ DataModel::DataModel(QObject* parent) :
         {AziRole, "azi"},
     };
 
-    for (auto [roleNum, name] : roleNamesHashMap.asKeyValueRange()) {
-        this->roleNamesMap[name] = roleNum;
+    for (auto [roleNum, name] : roleNumNameHashMap.asKeyValueRange()) {
+        this->roleNameNumMap[name] = roleNum;
     }
 
     auto randDouble = [](double maxValue) {
@@ -64,14 +64,21 @@ DataModel::DataModel(QObject* parent) :
     timer->start(this->updateInterval);
 }
 
-DataModel::DataModel(const DataModel& rhs) :
-    vehicleInfos{rhs.vehicleInfos}, roleNamesHashMap(rhs.roleNames()) {
+DataModel::DataModel(const DataModel& rhs) {
+    this->vehicleInfos = rhs.vehicleInfos;
+    this->roleNumNameHashMap = rhs.roleNumNameHashMap;
+    this->roleNameNumMap = rhs.roleNameNumMap;
+    this->updateInterval = rhs.updateInterval;
+    this->radiusOfDetect = rhs.radiusOfDetect;
 }
 
 DataModel& DataModel::operator=(const DataModel& rhs) {
     if (this != &rhs) {
-        vehicleInfos = rhs.vehicleInfos;
-        roleNamesHashMap = rhs.roleNames();
+        this->vehicleInfos = rhs.vehicleInfos;
+        this->roleNumNameHashMap = rhs.roleNumNameHashMap;
+        this->roleNameNumMap = rhs.roleNameNumMap;
+        this->updateInterval = rhs.updateInterval;
+        this->radiusOfDetect = rhs.radiusOfDetect;
     }
     return *this;
 }
@@ -106,11 +113,11 @@ QVariant DataModel::data(const QModelIndex& index, int role) const {
 }
 
 QHash<int, QByteArray> DataModel::roleNames() const {
-    return this->roleNamesHashMap;
+    return this->roleNumNameHashMap;
 }
 
-QVariantMap DataModel::getRoleNamesMap() const {
-    return this->roleNamesMap;
+QVariantMap DataModel::getRoleNameNumMap() const {
+    return this->roleNameNumMap;
 }
 
 void DataModel::updataData() {

@@ -17,7 +17,7 @@ Window {
             anchors.centerIn: parent;
             model: DataModel {}
             delegate: Rectangle {
-                width: 15;
+                width: 10;
                 height: width;
                 color: "green";
             }

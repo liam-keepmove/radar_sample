@@ -151,22 +151,29 @@ Item {
 
     // 根据数据模型更新或生成目标位置
     function renderTarget(model) {
-        let roleNamesMap = model.getRoleNamesMap();
+        let roleNameNumMap = model.getRoleNameNumMap();
         let modelList = [];
         for (let i = 0; i < model.rowCount(); i++) {
             let index = model.index(i, 0);
             let tempModel = {};
-            const entries = Object.entries(roleNamesMap);
-            entries.forEach(([roleNum, name]) => {
-                // console.log(roleNum, name);
-                tempModel[roleNum] = model.data(index, name);
-
-            });
+            for(let [name, roleNum] of Object.entries(roleNameNumMap)) {
+                tempModel[name] = model.data(index, roleNum);
+            };
             modelList[i] = tempModel;
-            // console.log("id: ", model.data(model.index(i, 0), roleNamesMap.id), " distance: ", model.data(model.index(i, 0), value_role.distance));
         }
-        console.log(JSON.stringify(modelList));
-        console.log("==================");
+
+        let coeff = 24000 / radius;
+        for (let j = 0; j < modelList.length; ++j) {
+            let modelData = modelList[j];
+            let distance = modelData.distance;
+            let angle = modelData.angle;
+            let show = delegate.createObject(radarUI);
+            Object.defineProperty(show, "model", {value: modelData, writable: true})
+            let jx = distance * Math.cos(angle * Math.PI / 180) / coeff;
+            let jy = distance * Math.sin(angle * Math.PI / 180) / coeff;
+            show.x = centerX + jx;
+            show.y = centerY - jy;
+        }
     }
 }
 

@@ -21,7 +21,7 @@ public:
     Q_INVOKABLE virtual QVariant data(const QModelIndex &index,
                                       int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
-    Q_INVOKABLE QVariantMap getRoleNamesMap() const;
+    Q_INVOKABLE QVariantMap getRoleNameNumMap() const;
 
     enum RoleNames {
         IdRole = Qt::UserRole + 1,
@@ -48,8 +48,8 @@ private slots:
 
 private:
     QList<VehicleInfo> vehicleInfos;
-    QHash<int, QByteArray> roleNamesHashMap;
-    QVariantMap roleNamesMap;
+    QHash<int, QByteArray> roleNumNameHashMap;
+    QVariantMap roleNameNumMap;
     int updateInterval = 1000;
     int radiusOfDetect = 24000;
 };
