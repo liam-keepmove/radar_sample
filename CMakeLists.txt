@@ -12,6 +12,10 @@ find_package(Qt6 6.5
     REQUIRED COMPONENTS Quick Core Widgets
 )
 
+if(QT_KNOWN_POLICY_QTP0001)
+    qt6_policy(SET QTP0001 OLD)
+endif()
+
 qt_add_executable(appradar
     main.cpp
     DataModel.hpp
@@ -22,6 +26,7 @@ qt_add_qml_module(appradar
     URI radar
     VERSION 1.0
     QML_FILES Main.qml Radar.qml
+    RESOURCES rc.qrc
 )
 
 set_target_properties(appradar PROPERTIES

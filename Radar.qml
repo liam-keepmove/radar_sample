@@ -1,6 +1,5 @@
 import QtQuick 2.15
 import QtQuick.Shapes 1.15
-import org.data_model 1.0
 
 Item {
     id: radarUI;
@@ -10,6 +9,7 @@ Item {
     property int fontSize: 16;
     property var model;
     property Component delegate;
+    property int showAreaZaxis: 0x0F;  // 雷达图上只显示设定区域内的目标：空中1、水面2、水下4、岸上8
     readonly property double radius: Math.min(width, height) / 2 - (fontSize * 2);
     readonly property double centerX: width / 2;
     readonly property double centerY: height / 2;
@@ -143,36 +143,62 @@ Item {
     }
 
     Connections {
+        id: connector;
         target: model;
+        property var showIdObjectObj: Object.create(null); // {idNum: showQmlObject, idNum: showQmlObject ...}
+        property var roleNameNumObj: model.getRoleNameNumMap(); // {id: 256, angle: 257 ...}
         function onDataChanged() {
             renderTarget(model);
         }
-    }
 
-    // 根据数据模型更新或生成目标位置
-    function renderTarget(model) {
-        let roleNameNumMap = model.getRoleNameNumMap();
-        let modelList = [];
-        for (let i = 0; i < model.rowCount(); i++) {
-            let index = model.index(i, 0);
-            let tempModel = {};
-            for(let [name, roleNum] of Object.entries(roleNameNumMap)) {
-                tempModel[name] = model.data(index, roleNum);
-            };
-            modelList[i] = tempModel;
-        }
+        // 根据数据模型更新或生成目标位置
+        function renderTarget(model) {
+            let modelList = [];  // [{id: 4001, angle: 121.34 ...}, ...]
+            for (let i = 0; i < model.rowCount(); i++) {
+                let index = model.index(i, 0);
+                let tempModel = {};
+                for(let [name, roleNum] of Object.entries(roleNameNumObj)) {
+                    tempModel[name] = model.data(index, roleNum);
+                };
+                if((tempModel.area & radarUI.showAreaZaxis) === tempModel.area) {
+                    modelList[i] = tempModel;
+                }
 
-        let coeff = 24000 / radius;
-        for (let j = 0; j < modelList.length; ++j) {
-            let modelData = modelList[j];
-            let distance = modelData.distance;
-            let angle = modelData.angle;
-            let show = delegate.createObject(radarUI);
-            Object.defineProperty(show, "model", {value: modelData, writable: true})
-            let jx = distance * Math.cos(angle * Math.PI / 180) / coeff;
-            let jy = distance * Math.sin(angle * Math.PI / 180) / coeff;
-            show.x = centerX + jx;
-            show.y = centerY - jy;
+            }
+
+            for(let [id, show] of Object.entries(showIdObjectObj)) {
+                let isIdExist = false;
+                for (let modelData of modelList) {
+                    if(id == modelData.id) {
+                        isIdExist = true;
+                        break;
+                    }
+                }
+                if(!isIdExist) {
+                    show.destroy(0);
+                    delete showIdObjectObj[id];
+                }
+            }
+
+            let coeff = 24000 / radius;
+            for (let j = 0; j < modelList.length; ++j) {
+                let modelData = modelList[j];
+                let id = modelData.id;
+                let distance = modelData.distance;
+                let angle = modelData.angle;
+                let newX = centerX + (distance * Math.cos(angle * Math.PI / 180) / coeff);
+                let newY = centerY - (distance * Math.sin(angle * Math.PI / 180) / coeff);
+                if(id in showIdObjectObj) {
+                    showIdObjectObj[id].model = modelData;
+                    showIdObjectObj[id].x = newX;
+                    showIdObjectObj[id].y = newY;
+                } else {
+                    let show = delegate.createObject(radarUI, {"model": modelData});
+                    show.x = newX;
+                    show.y = newY;
+                    showIdObjectObj[id] = show;
+                }
+            }
         }
     }
 }

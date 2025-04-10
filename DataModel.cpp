@@ -35,7 +35,7 @@ DataModel::VehicleInfo DataModel::generateRandomTarget() {
     static auto randDouble = [](double maxValue) {
         return QRandomGenerator::global()->bounded(maxValue);
     };
-    return DataModel::VehicleInfo{id++, randDouble(360.0), randDouble(radiusOfDetect), (int)randDouble(5), (int)randDouble(4), randDouble(360.0), 5 + randDouble(20)};
+    return DataModel::VehicleInfo{id++, randDouble(360.0), randDouble(radiusOfDetect), 1 << (int)randDouble(5), 1 << (int)randDouble(4), randDouble(360.0), 40 + randDouble(20)};
 }
 
 DataModel::DataModel(QObject* parent) :
@@ -52,11 +52,8 @@ DataModel::DataModel(QObject* parent) :
     for (auto [roleNum, name] : roleNumNameHashMap.asKeyValueRange()) {
         this->roleNameNumMap[name] = roleNum;
     }
-
-    auto randDouble = [](double maxValue) {
-        return QRandomGenerator::global()->bounded(maxValue);
-    };
-    for (int i = 0; i < 7; ++i) {
+    int randCount = QRandomGenerator::global()->bounded(7, 20);
+    for (int i = 0; i < randCount; ++i) {
         vehicleInfos.push_back(generateRandomTarget());
     }
     auto timer = new QTimer(this);

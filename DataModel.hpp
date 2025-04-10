@@ -36,8 +36,8 @@ public:
         int id;          // 目标载具批号
         double angle;    // 目标载具方位，单位度
         double distance; // 目标载具距离，单位米
-        int standpoint;  // 目标载具立场：我方、友方、敌方、中立、不明
-        int area;        // 载具所在区域：空中、水面、水下、岸上
+        int standpoint;  // 目标载具立场：我方1、友方2、敌方4、中立8、不明16
+        int area;        // 载具所在区域：空中1、水面2、水下4、岸上8
         double azi;      // 目标载具航向，单位度
         double speed;    // 速度，用来计算位置变化，单位m/s
     };
