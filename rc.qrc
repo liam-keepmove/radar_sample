@@ -4,5 +4,6 @@
         <file>icon/car.svg</file>
         <file>icon/ship.svg</file>
         <file>icon/submarine.svg</file>
+        <file>icon/unknown.svg</file>
     </qresource>
 </RCC>

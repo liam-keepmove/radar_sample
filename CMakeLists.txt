@@ -25,7 +25,7 @@ qt_add_executable(appradar
 qt_add_qml_module(appradar
     URI radar
     VERSION 1.0
-    QML_FILES Main.qml Radar.qml
+    QML_FILES Main.qml Radar.qml ColorImage.qml
     RESOURCES rc.qrc
 )
 

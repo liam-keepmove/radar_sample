@@ -9,7 +9,8 @@ Item {
     property int fontSize: 16;
     property var model;
     property Component delegate;
-    property int showAreaZaxis: 0x0F;  // 雷达图上只显示设定区域内的目标：空中1、水面2、水下4、岸上8
+    property double radiusOfDetect: 24000;
+    property int showAreaZaxis: 0x01 | 0x02 | 0x04 | 0x08;  // 雷达图上只显示设定区域内的目标：空中1、水面2、水下4、岸上8
     readonly property double radius: Math.min(width, height) / 2 - (fontSize * 2);
     readonly property double centerX: width / 2;
     readonly property double centerY: height / 2;
@@ -87,9 +88,9 @@ Item {
                     ctx.textBaseline = "bottom";
                     ctx.lineWidth = 1;
                     ctx.fillStyle = scaleColor;
-                    ctx.fillText("8km  ", 1 / 3 * radius, 0);
-                    ctx.fillText("16km  ", 2 / 3 * radius, 0);
-                    ctx.fillText("24km  ", radius, 0);
+                    ctx.fillText(`${Math.round(radiusOfDetect / 1000 * 1 / 3)}km  `, 1 / 3 * radius, 0);
+                    ctx.fillText(`${Math.round(radiusOfDetect / 1000 * 2 / 3)}km  `, 2 / 3 * radius, 0);
+                    ctx.fillText(`${Math.round(radiusOfDetect / 1000)}km  `, radius, 0);
                     ctx.restore();
                 }
                 ctx.restore();
@@ -161,7 +162,7 @@ Item {
                     tempModel[name] = model.data(index, roleNum);
                 };
                 if((tempModel.area & radarUI.showAreaZaxis) === tempModel.area) {
-                    modelList[i] = tempModel;
+                    modelList.push(tempModel);
                 }
 
             }
@@ -180,7 +181,7 @@ Item {
                 }
             }
 
-            let coeff = 24000 / radius;
+            let coeff = radiusOfDetect / radius;
             for (let j = 0; j < modelList.length; ++j) {
                 let modelData = modelList[j];
                 let id = modelData.id;

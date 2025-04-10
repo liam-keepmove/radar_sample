@@ -52,7 +52,7 @@ DataModel::DataModel(QObject* parent) :
     for (auto [roleNum, name] : roleNumNameHashMap.asKeyValueRange()) {
         this->roleNameNumMap[name] = roleNum;
     }
-    int randCount = QRandomGenerator::global()->bounded(7, 20);
+    int randCount = QRandomGenerator::global()->bounded(15, 40);
     for (int i = 0; i < randCount; ++i) {
         vehicleInfos.push_back(generateRandomTarget());
     }
